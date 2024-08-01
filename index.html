@@ -1,32 +1,51 @@
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Plaid Link</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #container {
+            text-align: center;
+        }
+    </style>
     <script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
 </head>
 <body>
-    <h1>Plaid Link</h1>
-    <button id="linkButton">Link your bank account</button>
-
+    <div id="container">
+        <h1>Plaid Link</h1>
+        <p>Initializing...</p>
+    </div>
     <script>
-        var linkToken = new URLSearchParams(window.location.search).get('link_token');
+        document.addEventListener('DOMContentLoaded', function () {
+            var linkToken = new URLSearchParams(window.location.search).get('link_token');
 
-        var handler = Plaid.create({
-            token: linkToken,
-            onSuccess: function(public_token, metadata) {
-                alert('Bank account linked successfully!');
-            },
-            onExit: function(err, metadata) {
-                if (err != null) {
-                    console.error('Exit with error:', err);
-                }
-            },
+            if (linkToken) {
+                var handler = Plaid.create({
+                    token: linkToken,
+                    onSuccess: function(public_token, metadata) {
+                        alert('Bank account linked successfully!');
+                    },
+                    onExit: function(err, metadata) {
+                        if (err != null) {
+                            console.error('Exit with error:', err);
+                        }
+                    },
+                });
+
+                // Open the Plaid Link flow automatically
+                handler.open();
+            } else {
+                document.getElementById('container').innerHTML = '<p>Error: Missing link token</p>';
+            }
         });
-
-        document.getElementById('linkButton').onclick = function() {
-            handler.open();
-        };
     </script>
 </body>
 </html>
